@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Map of Mexico: five places</title>
+<style>
+:root{--bg:#efe9dc;--ink:#1f2a24;--land:#d9cfb5;--line:#6b5d3f;--sea:#cfdbd6;--pin:#a63d2f;--card:#fbf8f1;--mut:#5b6359;--btn:#1f4d3a;--btnt:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171c19;--ink:#ece6d6;--land:#2e362f;--line:#8f8460;--sea:#202a27;--pin:#e0735f;--card:#222a25;--mut:#a9b0a5;--btn:#e3d9b8;--btnt:#1b211d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171c19;--ink:#ece6d6;--land:#2e362f;--line:#8f8460;--sea:#202a27;--pin:#e0735f;--card:#222a25;--mut:#a9b0a5;--btn:#e3d9b8;--btnt:#1b211d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Iowan Old Style",serif;line-height:1.6}
+main{max-width:1000px;margin:0 auto;padding:24px 18px 40px}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 20px;max-width:60ch}
+.wrap{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;align-items:start}
+@media (max-width:760px){.wrap{grid-template-columns:1fr}}
+.map{background:var(--sea);border:1.5px solid var(--line);border-radius:6px;padding:6px}
+svg{display:block;width:100%;height:auto}
+.land{fill:var(--land);stroke:var(--line);stroke-width:1.6;stroke-linejoin:round}
+.pin{cursor:pointer}
+.pin circle{fill:var(--pin);stroke:var(--bg);stroke-width:2.5}
+.pin .ring{fill:none;stroke:var(--pin);stroke-width:1.5;opacity:0}
+.pin:focus{outline:none}
+.pin:focus .ring,.pin.on .ring{opacity:1}
+.pin.on circle:first-of-type{r:9}
+.lbl{font:600 13px Georgia,serif;fill:var(--ink);paint-order:stroke;stroke:var(--sea);stroke-width:3px;pointer-events:none}
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:6px;padding:18px;min-height:260px}@media (min-width:761px){.panel{position:sticky;top:12px;max-height:90vh;overflow:auto}}
+.panel h2{margin:0 0 2px;font-size:1.3rem}
+.panel .st{color:var(--mut);margin:0 0 10px;font-style:italic}
+.panel p{margin:0 0 12px;max-width:55ch}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns a{background:var(--btn);color:var(--btnt);text-decoration:none;padding:10px 14px;border-radius:4px;font:600 .95rem system-ui,sans-serif}
+.btns a:focus-visible,.list button:focus-visible{outline:3px solid var(--pin);outline-offset:2px}
+.list{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.list button{font:.9rem system-ui,sans-serif;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer}
+.list button.on{background:var(--ink);color:var(--bg)}
+.panel{max-height:none}.panel h3{font-size:1rem;margin:16px 0 4px}.panel ul{margin:0;padding-left:1.1em}.panel li{margin-bottom:4px}.panel dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}.panel dt{font-weight:700}.panel dd{margin:0}
+.hint{color:var(--mut);font-size:.85rem;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>Map of Mexico</h1>
+<p class="sub">Five places across the country. Tap a point on the map or a button in the list to see its details and open it in Google Maps.</p>
+<div class="wrap">
+  <div class="map">
+    <svg id="svg" viewBox="0 0 720 480" role="img" aria-label="Sketch map of Mexico with five marked places">
+      <path id="mainland" class="land"/>
+      <path id="baja" class="land"/>
+      <g id="pins"></g>
+    </svg>
+  </div>
+  <section class="panel" id="panel" aria-live="polite"></section>
+</div>
+<div class="list" id="list"></div>
+<p class="hint">Information from public sources (INEGI, Mexico’s Ministry of Economy, INAH, tourism sites). Locations are approximate: confirm the exact spot when you open the map create for IG: hxesca_rj and axel.lxxz.</p>
+</main>
+<script>
+var SITES=[
+{id:"jalapa",n:"San Felipe Jalapa de Díaz",e:"Oaxaca",lat:18.067,lng:-96.533,dx:8,dy:-10,
+r:"A municipality in the Papaloapan region of northern Oaxaca, about 50 km west of Tuxtepec and part of its district.",
+datos:[["Population","28,500 inhabitants (2020)"],["Indigenous language","About 79% of people aged 3 and over speak at least one"],["Area","About 154 km²"],["Time zone","UTC−6"]],
+ver:["The town center and its church of the apostles Saints Philip and James","The jungle and hill scenery of the Papaloapan region"],
+cul:"A mostly Indigenous municipality, with Mazatec communities. It stands out for its number of registered traditional midwives in Oaxaca.",
+tip:"You usually get there through Tuxtepec. Tourist services are limited, so check roads and lodging before you go."},
+{id:"tetela",n:"Tétela de Ocampo",e:"Puebla",lat:19.81,lng:-97.8,dx:-8,dy:-12,a:"end",
+r:"A Pueblo Mágico in the Sierra Norte of Puebla (title granted in 2020). Its official name is Tres Veces Heroica Tetela de Ocampo.",
+datos:[["Meaning","From Nahuatl: place of many hills or stone mounds"],["Region","Sierra Norte of Puebla"],["Climate and setting","Temperate subhumid, with summer rains and pine and pine-oak forests"]],
+ver:["Church of Santa María de la Asunción and its bell tower, with views of the town and the mountains","Neoclassical Municipal Palace, with murals about local history","Acocomoca caves and the Tatzalan waterfall","Historic center with colonial streets"],
+hist:"Its people took part in the Battle of Puebla on May 5, 1862, with the Sixth Battalion of the Puebla National Guard, organized by Juan N. Méndez, Juan Crisóstomo Bonilla and Juan Francisco Lucas, the “Three Juans of the Sierra.” In colonial times it was also a mining area, mostly for gold.",
+com:"Gorditas de alberjón, tamales de milpa, tixmole and chayotextle (a dish made from chayote root). The area also grows coffee.",
+tip:"From the Mexico City–Puebla highway, continue on the Puebla–Tetela de Ocampo federal road. Bring a jacket: the mountains get fog and cold."},
+{id:"lagunillas",n:"Lagunas de San Pedro Lagunillas",e:"Nayarit",lat:21.21,lng:-104.76,dx:-10,dy:-8,a:"end",
+r:"A volcanic lake in south-central Nayarit, surrounded by hills. It formed when lava and other material blocked the basin’s original drainage.",
+datos:[["Size","About 2 km long and 1.6 to 1.75 km wide (sources vary)"],["Water","Shades from bluish green to emerald green"],["Distances","About 53 km from Tepic and about 20 km from Compostela"],["Activities","Fishing, hiking, boat rides and camping"]],
+ver:["San Pedro Lagunillas viewpoint, with panoramic views of the lake","“Los Mártires” plaza and the cobblestone streets of the town","The Árbol de los Terevintos, a historic landmark in the municipal seat","Birdwatching on the lake"],
+hist:"According to tradition, Mexica families passing through Tepetiltic split into three groups, and one of them settled in what is now San Pedro Lagunillas.",
+com:"Pescado zarandeado, fried mojarra and fish chicharrón at restaurants by the water.",
+tip:"The lakes of Santa María del Oro and Tepetiltic are nearby, if you want to build a lake route."},
+{id:"tepakan",n:"Tepakán",e:"Yucatán",lat:21.0486,lng:-89.0389,dx:-8,dy:-12,a:"end",
+r:"A municipality in north-central Yucatán, about 70 km east of Mérida. Its Maya name means place where there is pakán, a fruit similar to the prickly pear.",
+datos:[["Population","2,133 inhabitants (2020)"],["Area","About 134 km²"],["Before","It belonged to Izamal; sources give different dates for when it became a municipality"],["Communities","Jabada, Kantirix, Kantunich, Pochuná, Rosario, Tecate and Xemu, among others"]],
+ver:["Church of San Antonio de Padua, the town’s patron saint","Former henequen haciendas: Poccheiná, Kantirix and Sahcatzín"],
+hist:"Before the conquest it was part of the Ah Kin Chel chiefdom. In 1581 an encomienda was established in the region, and later it became henequen country, with haciendas devoted to agave.",
+tip:"Izamal is close and fits well into the same trip. Ask in town before entering the haciendas, since they are private property."},
+{id:"tihosuco",n:"Cenote de Tihosuco (Yaak Eek)",e:"Quintana Roo",lat:20.196,lng:-88.374,dx:-10,dy:18,a:"end",
+r:"A cenote near Tihosuco, a Maya town in central Quintana Roo, in the municipality of Felipe Carrillo Puerto. The pin marks the town; adjust it to the cenote’s exact spot when you have it.",
+datos:[["Tihosuco population","4,994 inhabitants (2010)"],["Name","From Maya jo’o tsuk: five stomachs"],["Route","Part of the Quintana Roo Church Route, along with Tepich, Xcabil, Huaymax, Sabán and Sacalaca"]],
+ver:["The church and its surroundings, tied to the Caste War","Caste War Museum, in town","Lalcah, an abandoned village in the jungle about 5 km to the southeast"],
+hist:"Tihosuco was one of the centers of the Caste War, the 19th-century Maya conflict in the peninsula. Today the town has community memory and heritage projects.",
+tip:"I couldn’t find reliable information about the Yaak Eek cenote in my searches. Ask in the community how to get there and whether there is a fee or a guide, and bring a swimsuit."}
+];
+var OUT=[[-117.1,32.5],[-114.7,32.7],[-114.8,31.8],[-113.1,31.2],[-112.3,29.1],[-110.7,27.9],[-109.4,26.2],[-108,25],[-106.5,23.2],[-105.4,21.6],[-105.6,20.4],[-105.2,19.1],[-103.5,18.3],[-101.8,17.5],[-99.9,16.7],[-97.8,15.9],[-95.5,15.9],[-94,16.2],[-92.2,14.5],[-91.4,14.1],[-91.7,15.5],[-90.9,17.2],[-89.2,17.8],[-88.3,18.5],[-87.5,18.2],[-87.4,19.6],[-86.8,21.2],[-87.5,21.5],[-88.5,21.5],[-90.4,21],[-90.4,20],[-90.7,19.3],[-91.5,18.5],[-92.8,18.5],[-94.4,18.2],[-95.9,18.8],[-96.4,19.9],[-97.3,21],[-97.7,22.5],[-97.7,24],[-97.2,25.9],[-99.1,26.4],[-99.5,27.5],[-100.8,29.1],[-102.4,29.8],[-103.1,29],[-104.5,29.6],[-105,30.7],[-106.5,31.8],[-108.2,31.8],[-108.2,31.3],[-111,31.3],[-114.8,32.5]];
+var BAJA=[[-117.1,32.5],[-116.6,31],[-115.7,29.7],[-114.6,28],[-114.1,27],[-112.2,25.3],[-111.6,24.2],[-110.3,23],[-109.5,23.1],[-109.9,24.2],[-111,25.6],[-112.2,27],[-113,28],[-114.3,29.5],[-114.8,31],[-114.7,32.7]];
+var W=720,H=480,LON0=-118,LON1=-86,LAT0=14,LAT1=33;
+function px(lng,lat){return [ (lng-LON0)/(LON1-LON0)*W, (LAT1-lat)/(LAT1-LAT0)*H ];}
+function path(a){return "M"+a.map(function(p){var q=px(p[0],p[1]);return q[0].toFixed(1)+","+q[1].toFixed(1)}).join("L")+"Z";}
+document.getElementById("mainland").setAttribute("d",path(OUT));
+document.getElementById("baja").setAttribute("d",path(BAJA));
+var NS="http://www.w3.org/2000/svg",pins=document.getElementById("pins"),list=document.getElementById("list"),panel=document.getElementById("panel");
+function esc(s){return s.replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function sec(t,h){return h?"<h3>"+t+"</h3>"+h:""}
+function ul(a){return a&&a.length?"<ul>"+a.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>":""}
+function show(id){
+  var s=SITES.filter(function(x){return x.id===id})[0];
+  if(!s)return;
+  var g="https://www.google.com/maps/search/?api=1&query="+s.lat+"%2C"+s.lng;
+  var dl=s.datos?"<dl>"+s.datos.map(function(d){return "<dt>"+esc(d[0])+"</dt><dd>"+esc(d[1])+"</dd>"}).join("")+"</dl>":"";
+  panel.innerHTML="<h2>"+esc(s.n)+"</h2><p class=\"st\">"+esc(s.e)+"</p><p>"+esc(s.r)+"</p><div class=\"btns\"><a href=\""+g+"\" target=\"_blank\" rel=\"noopener\">Open in Google Maps</a></div>"+sec("Facts",dl)+sec("What to see",ul(s.ver))+sec("History",s.hist?"<p>"+esc(s.hist)+"</p>":"")+sec("Culture",s.cul?"<p>"+esc(s.cul)+"</p>":"")+sec("What to eat",s.com?"<p>"+esc(s.com)+"</p>":"")+sec("Tip",s.tip?"<p>"+esc(s.tip)+"</p>":"");
+  panel.scrollTop=0;
+  document.querySelectorAll(".pin,.list button").forEach(function(el){el.classList.toggle("on",el.dataset.id===id)});
+}
+SITES.forEach(function(s){
+  var p=px(s.lng,s.lat),g=document.createElementNS(NS,"g");
+  g.setAttribute("class","pin");g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",s.n+", "+s.e);g.dataset.id=s.id;
+  g.innerHTML="<circle cx=\""+p[0]+"\" cy=\""+p[1]+"\" r=\"7\"/><circle class=\"ring\" cx=\""+p[0]+"\" cy=\""+p[1]+"\" r=\"13\"/><text class=\"lbl\" x=\""+(p[0]+s.dx)+"\" y=\""+(p[1]+s.dy)+"\" text-anchor=\""+(s.a||"start")+"\">"+esc(s.n.replace(" (Yaak Eek)",""))+"</text>";
+  g.addEventListener("click",function(){show(s.id)});
+  g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();show(s.id)}});
+  pins.appendChild(g);
+  var b=document.createElement("button");b.textContent=s.n;b.dataset.id=s.id;b.addEventListener("click",function(){show(s.id)});list.appendChild(b);
+});
+panel.innerHTML="<h2>Choose a place</h2><p>Tap a red dot on the map to see its details and open the location in Google Maps.</p>";
+</script>
+</body>
+</html>
